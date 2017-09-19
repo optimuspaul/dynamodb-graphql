@@ -1,0 +1,24 @@
+{
+    "name": "dynamodb-graphql",
+    "version": "1.0.0",
+    "description": "Framework for storing graph data in dynamodb and exposing it as a graphql service using apollo-server.",
+    "main": "src/index.js",
+    "scripts": {
+        "examine": "node --harmony src/index.js",
+        "test": "mocha src/base.spec.js",
+        "coverage": "istanbul cover -x src/**/**.spec.js _mocha src/**/**.spec.js && open coverage/lcov-report/index.html"
+    },
+    "dependencies": {
+        "aws-sdk": "^2.97.0",
+        "bluebird": "^3.5.0",
+        "ejs": "^2.5.7",
+        "iso-date-str": "^1.0.0",
+        "lru-cache": "^4.1.1",
+        "merge": "^1.2.0"
+    },
+    "devDependencies": {
+        "chai": "^4.1.2",
+        "istanbul": "^0.4.5",
+        "mocha": "^3.5.0"
+    }
+}
