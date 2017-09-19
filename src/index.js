@@ -26,3 +26,6 @@ exports.findNodeWithSpecificAttribute = findNodeWithSpecificAttribute;
 exports.deploy = function(project, tables, environment) {
     return provision.deploy(project, tables, environment);
 };
+
+exports.provision = provision;
+
