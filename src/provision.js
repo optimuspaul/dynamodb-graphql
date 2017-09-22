@@ -60,13 +60,10 @@ Resources:
         ProvisionedThroughput:
           ReadCapacityUnits: "5"
           WriteCapacityUnits: "5"
-  <% }); %>
-  <%= project %>Role:
+  <% }); %><%= project %>Role:
     Type: "AWS::IAM::Role"
-    DependsOn:
-    <% tables.forEach(function(table) { %>
-    - <%= table %>Table
-    <% }); %>
+    DependsOn:<% tables.forEach(function(table) { %>
+    - <%= table %>Table<% }); %>
     Properties:
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
@@ -93,11 +90,9 @@ Resources:
               - "dynamodb:PutItem"
               - "dynamodb:Query"
               - "dynamodb:Scan"
-              - "dynamodb:UpdateItem"
-              <% tables.forEach(function(table) { %>
+              - "dynamodb:UpdateItem"<% tables.forEach(function(table) { %>
               Resource: !Sub arn:aws:dynamodb:$\{AWS::Region}:$\{AWS::AccountId}:table/$\{<%= table %>Table}
-              Resource: !Sub arn:aws:dynamodb:$\{AWS::Region}:$\{AWS::AccountId}:table/$\{<%= table %>Table}/index/*
-              <% }); %>
+              Resource: !Sub arn:aws:dynamodb:$\{AWS::Region}:$\{AWS::AccountId}:table/$\{<%= table %>Table}/index/*<% }); %>
         - PolicyName: lambda-execute
           PolicyDocument:
             Version: "2012-10-17"
@@ -113,15 +108,18 @@ Resources:
               - "s3:PutObject"
               Resource:
               - "arn:aws:s3:::*"
-Outputs:
-<% tables.forEach(function(table) { %>
+Outputs:<% tables.forEach(function(table) { %>
   <%= table %>TableName:
-    Description: Information about the value
+    Description: name of the <%= table %> table
     Value: !Ref <%= table %>Table
     Export:
-      Name: <%= table %>TableName
-<% }); %>
-`;
+      Name: <%= project %><%= table %>TableName<% }); %>
+  ServiceRole:
+    Description: role with correct access to the tables
+    Value: !Ref <%= project %>Role
+    Export:
+      Name: <%= project %>Role`;
+
 
 var template = ejs.compile(data);
 
