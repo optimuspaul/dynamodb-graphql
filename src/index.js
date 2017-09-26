@@ -29,3 +29,4 @@ exports.deploy = function(project, tables, environment) {
 
 exports.provision = provision;
 
+exports.options = options;
