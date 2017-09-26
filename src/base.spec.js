@@ -83,7 +83,7 @@ describe('ddb interactions', function() {
         var promise = provision.deploy("testies", ["unitTests"], "dev");
 
         promise.then(function(d) {
-                tableName = d.unitTestsTableName;
+                tableName = d.testiesunitTestsTableName;
                 done();
             });
     });
