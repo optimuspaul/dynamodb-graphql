@@ -4,6 +4,7 @@ var options = require("./options");
 var bluebird = require('bluebird');
 var crypto = require("crypto");
 var isoDateStr = require("iso-date-str");
+const uuidv4 = require('uuid/v4');
 
 
 AWS.config.setPromisesDependency(bluebird);
@@ -192,6 +193,10 @@ function putObject(tableName, obj) {
     var ops = [];
     var mod = isoDateStr();
     var id = obj.id;
+    if(!id) {
+        id = uuidv4();
+    }
+    console.log(tableName);
     var newTripleHashes = new Set([]);
     for(const key in obj) {
         if(key != "id") {

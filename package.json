@@ -8,7 +8,7 @@
     "main": "src/index.js",
     "scripts": {
         "examine": "node --harmony src/index.js",
-        "test": "mocha src/config.spec.js",
+        "test": "mocha src/options.spec.js",
         "thing": "node --harmony thing.js",
         "coverage": "istanbul cover -x src/**/**.spec.js _mocha src/**/**.spec.js && open coverage/lcov-report/index.html"
     },
@@ -19,7 +19,8 @@
         "ejs": "^2.5.7",
         "iso-date-str": "^1.0.0",
         "lru-cache": "^4.1.1",
-        "merge": "^1.2.0"
+        "merge": "^1.2.0",
+        "uuid": "^3.1.0"
     },
     "devDependencies": {
         "chai": "^4.1.2",
