@@ -1,7 +1,8 @@
 const base = require("./base");
 const provision = require("./provision");
 const options = require("./options");
-
+const utils = require("./utils");
+var bluebird = require('bluebird');
 
 
 function getNode(type, id) {
@@ -9,7 +10,13 @@ function getNode(type, id) {
 }
 
 function listNodes(type, token) {
-    return {"nodes": [], "token": null};
+    // TODO - add token to base call and response
+    var predicated = base.getSubjectsWithPredicate(options.tableName(type), "id");
+    return new bluebird.Promise(function(resolve, reject) {
+        predicated.then(function(d) {
+            resolve({"nodes": d.subjects, "token": null});
+        });
+    });
 }
 
 function putNode(type, id, obj) {
@@ -52,5 +59,26 @@ exports.deploy = function(project, tables, environment) {
 };
 
 exports.provision = provision;
-
+exports.utils = utils;
 exports.options = options;
+
+
+exports.commonSchema = `
+  input PaginationInput {
+    # default max_items is 50
+    max_items: Int
+    token: String
+  }
+
+  type PaginationOutput {
+    max_items: Int!
+    token: String
+    count: Int
+  }
+
+  type StatusOutput {
+    id: String!
+    status: Boolean!
+    message: String
+  }
+`;

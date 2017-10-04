@@ -10,7 +10,6 @@ const tableName = function(objtype) {
 }
 
 
-
 function getLocalOptions() {
     if(localOptions) {
         console.log(" -- already loaded");
@@ -47,6 +46,7 @@ exports.getLabels = function() {
     }
     return labels;
 };
+
 
 exports.resolve = resolve;
 exports.cacheSeconds = cacheSeconds;

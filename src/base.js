@@ -4,7 +4,7 @@ var options = require("./options");
 var bluebird = require('bluebird');
 var crypto = require("crypto");
 var isoDateStr = require("iso-date-str");
-const uuidv4 = require('uuid/v4');
+const newid = require("./utils").newid;
 
 
 AWS.config.setPromisesDependency(bluebird);
@@ -22,6 +22,7 @@ function hashPair(key, value) {
 }
 
 function prepareTriple(subject, predicate, value, modificationDate) {
+    console.log("prepareTriple", subject, predicate, value, modificationDate)
     return {
         "id": {"S": subject},
         "hash": {"S": hashPair(predicate, value)},
@@ -127,7 +128,10 @@ function getSubjectsWithPredicate(tableName, predicate, token) {
                     data.Items.forEach(function(value) {
                         items.add(value.id.S);
                     });
-                    var subjects = Array.from(items);
+                    var subjects = [];
+                    Array.from(items).forEach(function(item) {
+                        subjects.push({id: item});
+                    });
                     var page_info = {
                         max_items: params.Limit,
                         count: subjects.length
@@ -194,32 +198,30 @@ function putObject(tableName, obj) {
     var mod = isoDateStr();
     var id = obj.id;
     if(!id) {
-        id = uuidv4();
+        obj.id = id = newid();
     }
     console.log(tableName);
     var newTripleHashes = new Set([]);
     for(const key in obj) {
-        if(key != "id") {
-            if(Array.isArray(obj[key])) {
-                obj[key].forEach(function(item, index) {
-                    var triple = prepareTriple(id, key, item, mod);
-                    newTripleHashes.add(triple.hash.S);
-                    triple.index = {"N": String(index)};
-                    ops.push({
-                        PutRequest: {
-                            Item: triple
-                        }
-                    });
-                })
-            } else {
-                var triple = prepareTriple(id, key, obj[key], mod);
+        if(Array.isArray(obj[key])) {
+            obj[key].forEach(function(item, index) {
+                var triple = prepareTriple(id, key, item, mod);
                 newTripleHashes.add(triple.hash.S);
+                triple.index = {"N": String(index)};
                 ops.push({
                     PutRequest: {
                         Item: triple
                     }
                 });
-            }
+            })
+        } else {
+            var triple = prepareTriple(id, key, obj[key], mod);
+            newTripleHashes.add(triple.hash.S);
+            ops.push({
+                PutRequest: {
+                    Item: triple
+                }
+            });
         }
     }
     return new bluebird.Promise(function(resolve, reject) {
@@ -246,7 +248,7 @@ function putObject(tableName, obj) {
                     // TODO - batch the batch if it's too many
                     var prom = dynamodb.batchWriteItem(params).promise();
                     return prom.then(function(data) {
-                        resolve({status: true});
+                        resolve({status: true, id: id, message: "success"});
                     }).catch(reject);
                 } else {
                     reject(new Error("nothing to do"));
@@ -276,7 +278,8 @@ function getObjectTriples(tableName, subject) {
 }
 
 function getObject(tableName, subject) {
-    var cached = cache.getCached(subject);
+    console.log("getting object from", tableName, subject);
+    var cached = cache.getCached(tableName+"::"+subject);
     return new bluebird.Promise(function(resolve, reject) {
         cached.then(function(data) {
             if(data) {
@@ -322,7 +325,7 @@ function getObject(tableName, subject) {
                             item[key] = rep;
                         }
                     });
-                    cache.cacheData(subject, item, options.cacheSeconds);
+                    cache.cacheData(tableName+"::"+subject, item, options.cacheSeconds);
                     resolve(item);
                 }
                 resolve(null);
