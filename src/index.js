@@ -21,13 +21,14 @@ function listNodes(type, token) {
 
 function putNode(type, id, obj) {
     obj["id"] = id;
-    console.log(type);
     return base.putObject(options.tableName(type), obj);
 }
+
 
 function deleteNode(type, id) {
     return base.removeObject(options.tableName(type), id);
 }
+
 
 function findNodesWithAttribute(type, attr, token) {
     // TODO - add token to base call and response

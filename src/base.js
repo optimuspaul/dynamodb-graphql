@@ -22,7 +22,6 @@ function hashPair(key, value) {
 }
 
 function prepareTriple(subject, predicate, value, modificationDate) {
-    console.log("prepareTriple", subject, predicate, value, modificationDate)
     return {
         "id": {"S": subject},
         "hash": {"S": hashPair(predicate, value)},
@@ -200,7 +199,6 @@ function putObject(tableName, obj) {
     if(!id) {
         obj.id = id = newid();
     }
-    console.log(tableName);
     var newTripleHashes = new Set([]);
     for(const key in obj) {
         if(Array.isArray(obj[key])) {
@@ -278,7 +276,6 @@ function getObjectTriples(tableName, subject) {
 }
 
 function getObject(tableName, subject) {
-    console.log("getting object from", tableName, subject);
     var cached = cache.getCached(tableName+"::"+subject);
     return new bluebird.Promise(function(resolve, reject) {
         cached.then(function(data) {
