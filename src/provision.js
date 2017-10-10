@@ -19,14 +19,6 @@ Parameters:
       - test
       - prod
     Description: The Name Of Your Environment
-  GitSHA:
-    Type: String
-    Default: ''
-    Description: SHA of git commit
-  DeployBucket:
-    Type: String
-    Default: ''
-    Description: Bucket name for code resources
 Resources:
   <% tables.forEach(function(table) { %><%= table %>Table:
     Type: "AWS::DynamoDB::Table"
