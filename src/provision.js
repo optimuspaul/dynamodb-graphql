@@ -20,8 +20,10 @@ Parameters:
       - prod
     Description: The Name Of Your Environment
 Resources:
-  <% tables.forEach(function(table) { %><%= table %>Table:
-    Type: "AWS::DynamoDB::Table"
+  <% tables.forEach(function(table, index) { %><%= table %>Table:
+    Type: "AWS::DynamoDB::Table"<% if(index > 0) { %>
+    DependsOn:
+    - <%= tables[index-1] %>Table<% } %>
     Properties:
       TableName: !Sub $\{Environment}-<%= project %>-<%= table %>
       AttributeDefinitions:
