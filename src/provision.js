@@ -19,6 +19,14 @@ Parameters:
       - test
       - prod
     Description: The Name Of Your Environment
+  Unit:
+    Type: String
+  Product:
+    Type: String
+  Subproduct:
+    Type: String
+  Version:
+    Type: String
 Resources:
   <% tables.forEach(function(table, index) { %><%= table %>Table:
     Type: "AWS::DynamoDB::Table"<% if(index > 0) { %>
