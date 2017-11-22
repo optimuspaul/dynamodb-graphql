@@ -245,8 +245,74 @@ function deleteStack(project, environment) {
     });
 }
 
+function createTableDirect(name) {
+    return new bluebird.Promise(function(resolve, reject) {
+            const dynamodb = new AWS.DynamoDB();
+
+            var params = {
+                AttributeDefinitions: [
+                    {AttributeName: "id", AttributeType: "S"},
+                    {AttributeName: "hash", AttributeType: "S"},
+                    {AttributeName: "predicate", AttributeType: "S"},
+                    {AttributeName: "value", AttributeType: "S"}
+                ],
+                KeySchema:  [
+                    {AttributeName: "id", KeyType: "HASH"},
+                    {AttributeName: "hash", KeyType: "RANGE"}
+                ],
+                ProvisionedThroughput: {
+                    ReadCapacityUnits: 5, 
+                    WriteCapacityUnits: 5
+                },
+                GlobalSecondaryIndexes: [
+                    {
+                      IndexName: "predicate-index",
+                      KeySchema: [
+                        {
+                          AttributeName: "predicate",
+                          KeyType: "HASH"
+                        }
+                      ],
+                      Projection: {
+                        ProjectionType: "ALL"
+                      },
+                      ProvisionedThroughput: {
+                        ReadCapacityUnits: "5",
+                        WriteCapacityUnits: "5"
+                      }
+                    },
+                    {
+                      IndexName: "value-index",
+                      KeySchema: [
+                        {
+                          AttributeName: "value",
+                          KeyType: "HASH"
+                        }
+                      ],
+                      Projection: {
+                        ProjectionType: "ALL"
+                      },
+                      ProvisionedThroughput: {
+                        ReadCapacityUnits: "5",
+                        WriteCapacityUnits: "5"
+                      }
+                    }
+                ],
+                TableName: name
+            }
+            const createPromise = dynamodb.createTable(params).promise();
+            createPromise.then(function(response) {
+                    // create the indexes
+                }).catch(function(err) {
+                    reject(err);
+                });
+        });
+}
 
 exports.generateCFN = generateCFN;
 exports.deploy = deploy;
 exports.deployStack = deployStack;
 exports.deleteStack = deleteStack;
+exports.createTableDirect = createTableDirect;
+
+
