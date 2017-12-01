@@ -1,4 +1,4 @@
-const base = require('./base')  
+const base = require('./base')
 const expect = require('chai').expect
 const provision = require('./provision');
 
@@ -22,7 +22,7 @@ const functions = [
 
 
 functions.forEach(function(func_name) {
-    describe('base module api', function() {  
+    describe('base module api', function() {
       describe('"'+func_name+'"', function() {
         it('should export a function', function() {
           expect(base[func_name]).to.be.a('function');
@@ -36,7 +36,7 @@ functions.forEach(function(func_name) {
 // Tests for hashing
 //--------------------------------------------------
 
-describe('base module functionality', function() {  
+describe('base module functionality', function() {
     describe('"hashPair"', function() {
         it('should produce a consistent hash for `key` and `value`', function() {
           expect(base.hashPair("key", "value")).to.equal('rn1Rn2ztJwrbwm9R7cp17Nuskdu3VHFl2c1zsL+kS6Q=');
@@ -56,7 +56,7 @@ describe('base module functionality', function() {
 // Tests for triple preparation
 //--------------------------------------------------
 
-describe('base module functionality', function() {  
+describe('base module functionality', function() {
     describe('"prepareTriple"', function() {
         it('should produce a ddb formatted item for a triple', function() {
           expect(base.prepareTriple("subject", "predicate", "value", "modificationDate")).to.deep.equal({
@@ -80,28 +80,28 @@ describe('ddb interactions', function() {
     this.timeout(150000);
 
     before(function(done) {
-        var promise = provision.deploy("testies", ["unitTests"], "dev");
+        var promise = provision.deploy("graphql", ["unitTests"], "dev");
 
         promise.then(function(d) {
-                tableName = d.testiesunitTestsTableName;
+                tableName = d.graphqlunitTestsTableName;
                 done();
             });
     });
 
     after(function(done) {
+      if(process.env.TEAR_DOWN_DDB === "YES") {
         try {
-        if(process.env.TEAR_DOWN_DDB == "YES") {
-            var promise = provision.deleteStack("testies", "dev");
-            promise.then(function(d) {
-                    done();
-                });
-        } else {
+          var promise = provision.deleteStack("graphql", "dev");
+          promise.then(function(d) {
             done();
+          });
+        }catch(e) {
+          console.log(e);
+          done();
         }
-    } catch(e) {
-        console.log(e);
+      } else {
         done();
-    }
+      }
     });
 
     describe('writeTriple/getTriple', function() {
@@ -242,9 +242,7 @@ describe('ddb interactions', function() {
             .then(function() {
                 var subjectsPromise = base.getSubjectsWithPredicate(tableName, "name");
                 subjectsPromise.then(function(subjects) {
-                        // console.log(subjects);
-                        var match = new Set(["obj1", "obj3"]);
-                        expect(new Set(subjects.subjects)).to.have.deep.keys(["obj1", "obj3"]);
+                        expect(new Set(subjects.subjects)).to.have.deep.keys([{id: "obj1"},{id: "obj3"}]);
                         done();
                     })
                     .catch(function(err) {
@@ -253,7 +251,44 @@ describe('ddb interactions', function() {
             });
         });
     });
+    describe('getSubjectsWithPredicateValue', function() {
+      it("Should find a set of subjects that have a predicate / value set", function(done) {
+        let obj1 = {
+          id: "obj6",
+          name: "boston"
+        }
+        let obj2 = {
+          id: "obj7",
+          name: "mclain"
+        }
+        after(function(done) {
+                Promise.all([
+                    base.removeObject(tableName, "obj6"),
+                    base.removeObject(tableName, "obj7"),
+                ])
+                .then(function(a, b) {
+                  done()
+                })
+            });
+
+        Promise.all([
+            base.putObject(tableName, obj1),
+            base.putObject(tableName, obj2)
+        ])
+        .then(function() {
+            var subjectsPromise = base.getSubjectsWithPredicateValue(tableName, "name", "boston");
+
+            subjectsPromise.then(function(subjects) {
+                    // var match = new Set(["obj1", "obj3"]);
+                    expect(new Set(subjects.subjects)).to.have.deep.keys([{id: "obj6"}]);
+                    done();
+                })
+                .catch(function(err) {
+                    done(err);
+                })
+        });
+      })
+    })
 
 
 });
-
