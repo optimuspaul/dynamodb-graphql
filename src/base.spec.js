@@ -83,7 +83,6 @@ describe('ddb interactions', function() {
         var promise = provision.deploy("graphql", ["unitTests"], "dev");
 
         promise.then(function(d) {
-          console.log(d)
                 tableName = d.graphqlunitTestsTableName;
                 done();
             });
@@ -101,7 +100,6 @@ describe('ddb interactions', function() {
           done();
         }
       } else {
-
         done();
       }
     });
@@ -255,21 +253,22 @@ describe('ddb interactions', function() {
     });
     describe('getSubjectsWithPredicateValue', function() {
       it("Should find a set of subjects that have a predicate / value set", function(done) {
-        var obj1 = {
-          id: 'obj1',
-          name: 'one'
+        let obj1 = {
+          id: "obj6",
+          name: "boston"
         }
-        var obj2 = {
-          id: 'obj2',
-          name: 'two'
+        let obj2 = {
+          id: "obj7",
+          name: "mclain"
         }
         after(function(done) {
                 Promise.all([
-                    base.removeObject(tableName, "obj1"),
-                    base.removeObject(tableName, "obj2"),
+                    base.removeObject(tableName, "obj6"),
+                    base.removeObject(tableName, "obj7"),
                 ])
-                .then(function() {})
-                .then(done, done);
+                .then(function(a, b) {
+                  done()
+                })
             });
 
         Promise.all([
@@ -277,12 +276,11 @@ describe('ddb interactions', function() {
             base.putObject(tableName, obj2)
         ])
         .then(function() {
-            var subjectsPromise = base.getSubjectsWithPredicateValue(tableName, "name", "one");
+            var subjectsPromise = base.getSubjectsWithPredicateValue(tableName, "name", "boston");
 
             subjectsPromise.then(function(subjects) {
-                    console.log(subjects);
                     // var match = new Set(["obj1", "obj3"]);
-                    // expect(new Set(subjects.subjects)).to.have.deep.keys(["obj1", "obj3"]);
+                    expect(new Set(subjects.subjects)).to.have.deep.keys([{id: "obj6"}]);
                     done();
                 })
                 .catch(function(err) {
