@@ -208,6 +208,7 @@ function removeObject(tableName, subject) {
     return new bluebird.Promise(function(resolve, reject) {
         getObjectTriples(tableName, subject)
             .then(function(data) {
+              
                 data.forEach(function(triple) {
                     ops.push({
                         DeleteRequest: {
