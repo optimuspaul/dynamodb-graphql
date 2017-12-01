@@ -162,7 +162,7 @@ function getSubjectsWithPredicateValue(tableName, predicate, value) {
     return new bluebird.Promise(function(resolve, reject) {
       var params = {
           Limit: 50,
-          TableName: 'local-ServiceRegistry-service',
+          TableName: tableName,
           KeyConditionExpression: "#my_val = :my_val",
           FilterExpression: "predicate = :id",
           ExpressionAttributeValues: {

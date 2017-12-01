@@ -133,6 +133,23 @@ function generateCFN(project, tables) {
 
 function deployStack(project, stack, environment) {
     var stackName = environment + "-" + project;
+    var stackParams = [{
+      ParameterKey: "Unit",
+      ParameterValue: "techops",
+      UsePreviousValue: false
+    },{
+      ParameterKey: "Product",
+      ParameterValue: "cloud-engineering",
+      UsePreviousValue: false
+    },{
+      ParameterKey: "Subproduct",
+      ParameterValue: "bdp",
+      UsePreviousValue: false
+    },{
+      ParameterKey: "Version",
+      ParameterValue: "1.0",
+      UsePreviousValue: false
+    }]
     return new bluebird.Promise(function(resolve, reject) {
         cloudformation.describeStacks({StackName: stackName}).promise()
             .then(function(d) {
@@ -141,6 +158,7 @@ function deployStack(project, stack, environment) {
                     StackName: stackName,
                     Capabilities: ["CAPABILITY_NAMED_IAM"],
                     TemplateBody: stack,
+                    Parameters: stackParams
                 }
                 cloudformation.updateStack(params).promise()
                     .then(function(d) {
@@ -178,6 +196,7 @@ function deployStack(project, stack, environment) {
                     StackName: stackName,
                     Capabilities: ["CAPABILITY_NAMED_IAM"],
                     TemplateBody: stack,
+                    Parameters: stackParams
                 }
                 cloudformation.createStack(params).promise()
                     .then(function(d) {
@@ -261,7 +280,7 @@ function createTableDirect(name) {
                     {AttributeName: "hash", KeyType: "RANGE"}
                 ],
                 ProvisionedThroughput: {
-                    ReadCapacityUnits: 5, 
+                    ReadCapacityUnits: 5,
                     WriteCapacityUnits: 5
                 },
                 GlobalSecondaryIndexes: [
@@ -314,5 +333,3 @@ exports.deploy = deploy;
 exports.deployStack = deployStack;
 exports.deleteStack = deleteStack;
 exports.createTableDirect = createTableDirect;
-
-
