@@ -155,6 +155,52 @@ function getSubjectsWithPredicate(tableName, predicate, token) {
 
 function getSubjectsWithPredicateValue(tableName, predicate, value) {
     // pulls a list of subjects that have a predicate with specified value
+    return new bluebird.Promise(function(resolve, reject) {
+      var params = {
+          Limit: 50,
+          TableName: tableName,
+          KeyConditionExpression: "#my_val = :my_val",
+          FilterExpression: "predicate = :id",
+          ExpressionAttributeValues: {
+              ":id": {"S": predicate},
+              ":my_val": {"S": value}
+          },
+          ExpressionAttributeNames: {
+            "#my_val": "value"
+          },
+          IndexName: "value-index"
+      }
+      var prom = dynamodb.query(params).promise();
+      prom.then(function(data) {
+              if(data.Items.length > 0) {
+                  var items = new Set([]);
+                  data.Items.forEach(function(value) {
+                      items.add(value.id.S);
+                  });
+                  var subjects = [];
+                  Array.from(items).forEach(function(item) {
+                      subjects.push({id: item});
+                  });
+                  var page_info = {
+                      max_items: params.Limit,
+                      count: subjects.length
+                  };
+                  if(data.LastEvaluatedKey) {
+                      page_info.token = new Buffer(JSON.stringify(data.LastEvaluatedKey)).toString("base64");
+                  }
+                  var result = {
+                      subjects: subjects,
+                      pageInfo: page_info
+                  };
+                  resolve(result);
+              } else {
+                  resolve({subjects: []});
+              }
+          })
+          .catch(function(err) {
+              reject(err);
+          });
+    })
 }
 
 function removeObject(tableName, subject) {
@@ -162,6 +208,7 @@ function removeObject(tableName, subject) {
     return new bluebird.Promise(function(resolve, reject) {
         getObjectTriples(tableName, subject)
             .then(function(data) {
+              
                 data.forEach(function(triple) {
                     ops.push({
                         DeleteRequest: {
