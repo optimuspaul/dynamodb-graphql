@@ -1,14 +1,18 @@
-var AWS = require("aws-sdk");
 var cache = require("./cache");
 var options = require("./options");
 var bluebird = require('bluebird');
 var crypto = require("crypto");
 var isoDateStr = require("iso-date-str");
 const newid = require("./utils").newid;
+const ENVIRONMENT = process.env["ENVIRONMENT"] || "dev";
+const AWS = require("aws-sdk");
 
 
-AWS.config.setPromisesDependency(bluebird);
 AWS.config.region = process.env["aws-region"] || "us-east-1";
+if(ENVIRONMENT == "local") {
+    AWS.config.dynamodb = {endpoint: 'http://localhost:8001'};
+}
+
 
 var dynamodb = new AWS.DynamoDB();
 
@@ -347,3 +351,6 @@ exports.getObject = getObject;
 exports.putObject = putObject;
 exports.removeObject = removeObject;
 exports.getObjectTriples = getObjectTriples;
+
+exports.dynamodb = dynamodb;
+
