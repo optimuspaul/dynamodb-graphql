@@ -1,9 +1,11 @@
 var ejs = require('ejs');
-var AWS = require("aws-sdk");
 var bluebird = require('bluebird');
-
+const AWS = require("aws-sdk");
+const dynamodb = require("./base").dynamodb;
+const ENVIRONMENT = process.env["ENVIRONMENT"] || "dev";
 
 AWS.config.region = process.env["aws-region"] || "us-east-1";
+
 
 var cloudformation = new AWS.CloudFormation();
 
@@ -274,8 +276,6 @@ function deleteStack(project, environment) {
 
 function createTableDirect(name) {
     return new bluebird.Promise(function(resolve, reject) {
-            const dynamodb = new AWS.DynamoDB();
-
             var params = {
                 AttributeDefinitions: [
                     {AttributeName: "id", AttributeType: "S"},
@@ -329,7 +329,7 @@ function createTableDirect(name) {
             }
             const createPromise = dynamodb.createTable(params).promise();
             createPromise.then(function(response) {
-                    // create the indexes
+                    resolve(response);
                 }).catch(function(err) {
                     reject(err);
                 });

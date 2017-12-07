@@ -62,6 +62,7 @@ exports.deploy = function(project, tables, environment) {
 exports.provision = provision;
 exports.utils = utils;
 exports.options = options;
+exports.base = base;
 
 
 exports.commonSchema = `
