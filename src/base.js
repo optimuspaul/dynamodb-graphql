@@ -11,7 +11,7 @@ const AWS = require("aws-sdk");
 
 AWS.config.region = process.env["aws-region"] || "us-east-1";
 if(ENVIRONMENT == "local") {
-    AWS.config.dynamodb = {endpoint: `http://${process.env['DYNAMODB_URL']}`};
+    AWS.config.dynamodb = {endpoint: `http://${DYNAMODB_URL}`};
 }
 
 
