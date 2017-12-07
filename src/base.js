@@ -5,12 +5,13 @@ var crypto = require("crypto");
 var isoDateStr = require("iso-date-str");
 const newid = require("./utils").newid;
 const ENVIRONMENT = process.env["ENVIRONMENT"] || "dev";
+const DYNAMODB_URL = process.env["DYNAMODB_URL"] || 'localhost:8001';
 const AWS = require("aws-sdk");
 
 
 AWS.config.region = process.env["aws-region"] || "us-east-1";
 if(ENVIRONMENT == "local") {
-    AWS.config.dynamodb = {endpoint: 'http://localhost:8001'};
+    AWS.config.dynamodb = {endpoint: `http://${DYNAMODB_URL}`};
 }
 
 
@@ -212,7 +213,7 @@ function removeObject(tableName, subject) {
     return new bluebird.Promise(function(resolve, reject) {
         getObjectTriples(tableName, subject)
             .then(function(data) {
-              
+
                 data.forEach(function(triple) {
                     ops.push({
                         DeleteRequest: {
@@ -400,4 +401,3 @@ exports.removeObject = removeObject;
 exports.getObjectTriples = getObjectTriples;
 
 exports.dynamodb = dynamodb;
-
