@@ -22,7 +22,7 @@ Parameters:
       - prod
     Description: The Name Of Your Environment
 <% extraParameters.forEach(function(param, index) {%>
-  <%= param.name %>
+  <%= param.name %>:
     Type: <%= param.type %>
 <% }); %>Resources:
   <% tables.forEach(function(table, index) { %><%= table %>Table:
