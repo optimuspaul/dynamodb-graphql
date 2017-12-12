@@ -1,6 +1,5 @@
 var cache = require("./cache");
 var options = require("./options");
-var bluebird = require('bluebird');
 var crypto = require("crypto");
 var isoDateStr = require("iso-date-str");
 const newid = require("./utils").newid;
@@ -51,7 +50,7 @@ function getTriple(tableName, subject, predicate, value) {
             hash: {"S": hashPair(predicate, value)},
         }
     }
-    return new bluebird.Promise(function(resolve, reject) {
+    return new Promise(function(resolve, reject) {
         var prom = dynamodb.getItem(params).promise();
         prom.then(function(data) {
             var item = {};
@@ -76,7 +75,7 @@ function writeTriple(tableName, subject, predicate, value) {
         TableName: tableName,
         Item: item,
     }
-    return new bluebird.Promise(function(resolve, reject) {
+    return new Promise(function(resolve, reject) {
         var prom = dynamodb.putItem(params).promise();
         prom.then(function(data) {
                 resolve(item);
@@ -94,7 +93,7 @@ function removeTriple(tableName, subject, predicate, value) {
         TableName: tableName,
         Key: item,
     }
-    return new bluebird.Promise(function(resolve, reject) {
+    return new Promise(function(resolve, reject) {
         var prom = dynamodb.deleteItem(params).promise();
         prom.then(function(data) {
                 resolve(item);
@@ -107,7 +106,7 @@ function removeTriple(tableName, subject, predicate, value) {
 
 function getSubjectsWithPredicate(tableName, predicate, token) {
     // pulls a list of subjects that have a value for the specified predicate
-    return new bluebird.Promise(function(resolve, reject) {
+    return new Promise(function(resolve, reject) {
         var params = {
             Limit: 50,
             TableName: tableName,
@@ -160,7 +159,7 @@ function getSubjectsWithPredicate(tableName, predicate, token) {
 
 function getSubjectsWithPredicateValue(tableName, predicate, value) {
     // pulls a list of subjects that have a predicate with specified value
-    return new bluebird.Promise(function(resolve, reject) {
+    return new Promise(function(resolve, reject) {
       var params = {
           Limit: 50,
           TableName: tableName,
@@ -210,10 +209,9 @@ function getSubjectsWithPredicateValue(tableName, predicate, value) {
 
 function removeObject(tableName, subject) {
     var ops = [];
-    return new bluebird.Promise(function(resolve, reject) {
+    return new Promise(function(resolve, reject) {
         getObjectTriples(tableName, subject)
             .then(function(data) {
-
                 data.forEach(function(triple) {
                     ops.push({
                         DeleteRequest: {
@@ -233,7 +231,7 @@ function removeObject(tableName, subject) {
                     // TODO - batch the batch if it's too many
                     var prom = dynamodb.batchWriteItem(params).promise();
                     return prom.then(function(data) {
-                        resolve({status: true});
+                        resolve({id: subject, status: true});
                     }).catch(reject);
                 } else {
                     reject(new Error("nothing to do"));
@@ -274,7 +272,7 @@ function putObject(tableName, obj) {
             });
         }
     }
-    return new bluebird.Promise(function(resolve, reject) {
+    return new Promise(function(resolve, reject) {
         getObjectTriples(tableName, id)
             .then(function(data) {
                 data.forEach(function(triple) {
@@ -309,7 +307,7 @@ function putObject(tableName, obj) {
 }
 
 function getObjectTriples(tableName, subject) {
-    return new bluebird.Promise(function(resolve, reject) {
+    return new Promise(function(resolve, reject) {
         var params = {
             KeyConditionExpression: "id = :id",
             ExpressionAttributeValues: {
@@ -329,7 +327,7 @@ function getObjectTriples(tableName, subject) {
 
 function getObject(tableName, subject) {
     var cached = cache.getCached(tableName+"::"+subject);
-    return new bluebird.Promise(function(resolve, reject) {
+    return new Promise(function(resolve, reject) {
         cached.then(function(data) {
             if(data) {
                 console.log(subject + " was cached ******************");

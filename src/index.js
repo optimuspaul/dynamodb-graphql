@@ -21,6 +21,7 @@ function listNodes(type, token) {
 
 function putNode(type, id, obj) {
     obj["id"] = id;
+    console.log(options.tableName(type));
     return base.putObject(options.tableName(type), obj);
 }
 
@@ -35,11 +36,6 @@ function findNodesWithAttribute(type, attr, token) {
     return base.getSubjectsWithPredicate(options.tableName(type), attr);
 }
 
-function findAttributes(type, id, attr) {
-    // TODO - do this. This would be used to return a single property, which could have multiple values, for a node.
-    return {};
-}
-
 function filterNodes(type, attr, value, token) {
     // TODO - add token to base call and response
     return base.getSubjectsWithPredicateValue(options.tableName(type), attr, value);
@@ -51,7 +47,6 @@ exports.putNode = putNode;
 exports.deleteNode = deleteNode;
 exports.listNodes = listNodes;
 exports.findNodesWithAttribute = findNodesWithAttribute;
-exports.findAttributes = findAttributes;
 exports.filterNodes = filterNodes;
 
 

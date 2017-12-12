@@ -21,15 +21,10 @@ Parameters:
       - test
       - prod
     Description: The Name Of Your Environment
-  Unit:
-    Type: String
-  Product:
-    Type: String
-  Subproduct:
-    Type: String
-  Version:
-    Type: String
-Resources:
+<% extraParameters.forEach(function(param, index) {%>
+  <%= param.name %>
+    Type: <%= param.type %>
+<% }); %>Resources:
   <% tables.forEach(function(table, index) { %><%= table %>Table:
     Type: "AWS::DynamoDB::Table"<% if(index > 0) { %>
     DependsOn:
@@ -135,8 +130,8 @@ Outputs:<% tables.forEach(function(table) { %>
 
 var template = ejs.compile(data);
 
-function generateCFN(project, tables) {
-    return template({tables: tables, project: project});
+function generateCFN(project, tables, extraParameters) {
+    return template({tables: tables, project: project, extraParameters: extraParameters});
 }
 
 function deployStack(project, stack, environment) {
