@@ -231,7 +231,7 @@ function removeObject(tableName, subject) {
                     // TODO - batch the batch if it's too many
                     var prom = dynamodb.batchWriteItem(params).promise();
                     return prom.then(function(data) {
-                        resolve({status: true});
+                        resolve({id: subject, status: true});
                     }).catch(reject);
                 } else {
                     reject(new Error("nothing to do"));
