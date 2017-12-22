@@ -14,8 +14,8 @@ addons:
 env:
   global:
     - JAVA_HOME=/usr/lib/jvm/java-8-oracle
-    - AWS_ACCESS_KEY=FAKE
-    - AWS_SECRET_KEY=NEWS
+    - AWS_ACCESS_KEY_ID=FAKE
+    - AWS_SECRET_ACCESS_KEY=NEWS
 
 
 
