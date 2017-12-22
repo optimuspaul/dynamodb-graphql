@@ -1,8 +1,22 @@
-
+sudo: required
 
 language: node_js
+
 node_js:
-  - "lts/*"
   - "8"
 
-script: npm run coverage
+addons:
+  apt:
+    packages:
+    - oracle-java8-installer
+    - oracle-java8-set-default
+
+env:
+  AWS_ACCESS_KEY: FAKE
+  AWS_SECRET_KEY: NEWS
+  global:
+    - JAVA_HOME=/usr/lib/jvm/java-8-oracle
+
+
+
+script: npm test
