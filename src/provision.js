@@ -97,9 +97,9 @@ Parameters:
               - "dynamodb:PutItem"
               - "dynamodb:Query"
               - "dynamodb:Scan"
-              - "dynamodb:UpdateItem"<% tables.forEach(function(table) { %>
-              Resource: !Sub arn:aws:dynamodb:$\{AWS::Region}:$\{AWS::AccountId}:table/$\{<%= table %>Table}
-              Resource: !Sub arn:aws:dynamodb:$\{AWS::Region}:$\{AWS::AccountId}:table/$\{<%= table %>Table}/index/*<% }); %>
+              - "dynamodb:UpdateItem"
+              Resource: <% tables.forEach(function(table) { %>
+              - !Sub arn:aws:dynamodb:$\{AWS::Region}:$\{AWS::AccountId}:table/$\{<%= table %>Table}*<% }); %>
         - PolicyName: lambda-execute
           PolicyDocument:
             Version: "2012-10-17"
@@ -115,6 +115,82 @@ Parameters:
               - "s3:PutObject"
               Resource:
               - "arn:aws:s3:::*"
+  DBAutoScaleRole:
+    DependsOn:<% tables.forEach(function(table) { %>
+      - <%= table %>Table<% }); %>
+    Type: AWS::IAM::Role
+    Properties:
+      Path: "/"
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: application-autoscaling.amazonaws.com
+          Action: sts:AssumeRole
+      Policies:
+      - PolicyName: DynamoAutoscale
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+              - dynamodb:DescribeTable
+              - dynamodb:UpdateTable
+            Resource: "*"
+          - Effect: Allow
+            Action:
+              - cloudwatch:PutMetricAlarm
+              - cloudwatch:DescribeAlarms
+              - cloudwatch:DeleteAlarms
+            Resource: "*"
+  <% tables.forEach(function(table, index) { %><%= table %>DatabaseReadTarget:
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+    Properties:
+      MaxCapacity: 1500
+      MinCapacity: 5
+      ResourceId:
+        Fn::Join:
+          - /
+          - - table
+            - !Ref <%= table %>Table
+      RoleARN: !GetAtt DBAutoScaleRole.Arn
+      ScalableDimension: dynamodb:table:ReadCapacityUnits
+      ServiceNamespace: dynamodb
+  <%= table %>DatabaseWriteTarget:
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+    Properties:
+      MaxCapacity: 1500
+      MinCapacity: 5
+      ResourceId: !GetAtt <%= table %>Table.Arn
+      RoleARN: !GetAtt DBAutoScaleRole.Arn
+      ScalableDimension: dynamodb:table:WriteCapacityUnits
+      ServiceNamespace: dynamodb
+  <%= table %>DatabaseAutoscaleReadPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties:
+      PolicyName: !Sub $\{Environment}-<%= project %>-<%= table %>-AutoscalingReadPolicy
+      PolicyType: TargetTrackingScaling
+      ScalingTargetId: !Ref <%= table %>DatabaseReadTarget
+      TargetTrackingScalingPolicyConfiguration:
+        PredefinedMetricSpecification:
+          PredefinedMetricType: DynamoDBReadCapacityUtilization
+        ScaleOutCooldown: 60
+        ScaleInCooldown: 60
+        TargetValue: 80
+  <%= table %>DatabaseAutoscaleWritePolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties:
+      PolicyName: !Sub $\{Environment}-<%= project %>-<%= table %>-AutoscalingWritePolicy
+      PolicyType: TargetTrackingScaling
+      ScalingTargetId: !Ref <%= table %>DatabaseWriteTarget
+      TargetTrackingScalingPolicyConfiguration:
+        PredefinedMetricSpecification:
+          PredefinedMetricType: DynamoDBWriteCapacityUtilization
+        ScaleOutCooldown: 60
+        ScaleInCooldown: 60
+        TargetValue: 80
+  <% }); %>
 Outputs:<% tables.forEach(function(table) { %>
   <%= table %>TableName:
     Description: name of the <%= table %> table
