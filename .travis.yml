@@ -12,10 +12,10 @@ addons:
     - oracle-java8-set-default
 
 env:
-  AWS_ACCESS_KEY: FAKE
-  AWS_SECRET_KEY: NEWS
   global:
     - JAVA_HOME=/usr/lib/jvm/java-8-oracle
+    - AWS_ACCESS_KEY=FAKE
+    - AWS_SECRET_KEY=NEWS
 
 
 
