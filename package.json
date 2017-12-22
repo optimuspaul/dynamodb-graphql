@@ -1,25 +1,4 @@
 {
-  "_from": "github:SPSCommerce/dynamodb-graphql",
-  "_id": "dynamodb-graphql@1.0.0",
-  "_inBundle": false,
-  "_location": "/dynamodb-graphql",
-  "_phantomChildren": {},
-  "_requested": {
-    "type": "git",
-    "raw": "dynamodb-graphql@github:SPSCommerce/dynamodb-graphql",
-    "name": "dynamodb-graphql",
-    "escapedName": "dynamodb-graphql",
-    "rawSpec": "github:SPSCommerce/dynamodb-graphql",
-    "saveSpec": "github:SPSCommerce/dynamodb-graphql",
-    "fetchSpec": null,
-    "gitCommittish": null
-  },
-  "_requiredBy": [
-    "/"
-  ],
-  "_resolved": "github:SPSCommerce/dynamodb-graphql#54f88cfb347568256d92493b16cb863e7b18acc1",
-  "_spec": "dynamodb-graphql@github:SPSCommerce/dynamodb-graphql",
-  "_where": "/Users/pauldecoursey/Dropbox/sps-projects/service-registry",
   "author": {
     "name": "optimuspaul"
   },
@@ -46,12 +25,12 @@
   "keywords": [],
   "license": "MIT",
   "main": "src/index.js",
-  "name": "dynamodb-graphql",
+  "name": "@bluelines/dynamodb-graphql",
   "scripts": {
     "coverage": "node_modules/.bin/nyc  -x src/**/**.spec.js --reporter=html npm test --timeout 30000 && cat coverage/index.html",
     "examine": "node --harmony src/index.js",
     "test": "mocha src/**/**.spec.js --timeout 30000",
     "thing": "node --harmony thing.js"
   },
-  "version": "1.0.0"
+  "version": "1.0.1"
 }
