@@ -3,7 +3,7 @@
  * This could be replaced with memcached or
  * redis in the future or DAX I suppose.
  **********************************************/
-const DISABLE_CACHE = process.env["DISABLE_CACHE"];
+var DISABLE_CACHE = process.env["DISABLE_CACHE"];
 
 var bluebird = require('bluebird');
 var LRU = require("lru-cache")

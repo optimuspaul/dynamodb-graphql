@@ -22,7 +22,7 @@ Parameters:
       - prod
     Description: The Name Of Your Environment
 <% extraParameters.forEach(function(param, index) {%>
-  <%= param.name %>:
+  <%= param.name %>
     Type: <%= param.type %>
 <% }); %>Resources:
   <% tables.forEach(function(table, index) { %><%= table %>Table:
@@ -131,30 +131,37 @@ Outputs:<% tables.forEach(function(table) { %>
 var template = ejs.compile(data);
 
 function generateCFN(project, tables, extraParameters) {
-    return template({tables: tables, project: project, extraParameters: extraParameters});
+    const context = {
+        tables: tables,
+        project: project,
+        extraParameters: extraParameters || []
+    }
+    return template(context);
 }
 
 function deployStack(project, stack, environment) {
     var stackName = environment + "-" + project;
     var stackParams = [{
-      ParameterKey: "Unit",
-      ParameterValue: "techops",
-      UsePreviousValue: false
-    },{
-      ParameterKey: "Product",
-      ParameterValue: "cloud-engineering",
-      UsePreviousValue: false
-    },{
-      ParameterKey: "Subproduct",
-      ParameterValue: "bdp",
-      UsePreviousValue: false
-    },{
-      ParameterKey: "Version",
-      ParameterValue: "1.0",
-      UsePreviousValue: false
+        ParameterKey: "Unit",
+        ParameterValue: "techops",
+        UsePreviousValue: false
+    }, {
+        ParameterKey: "Product",
+        ParameterValue: "cloud-engineering",
+        UsePreviousValue: false
+    }, {
+        ParameterKey: "Subproduct",
+        ParameterValue: "bdp",
+        UsePreviousValue: false
+    }, {
+        ParameterKey: "Version",
+        ParameterValue: "1.0",
+        UsePreviousValue: false
     }]
     return new bluebird.Promise(function(resolve, reject) {
-        cloudformation.describeStacks({StackName: stackName}).promise()
+        cloudformation.describeStacks({
+                StackName: stackName
+            }).promise()
             .then(function(d) {
                 // stack exists, let's update it
                 var params = {
@@ -165,22 +172,24 @@ function deployStack(project, stack, environment) {
                 }
                 cloudformation.updateStack(params).promise()
                     .then(function(d) {
-                        var waiter = cloudformation.waitFor('stackUpdateComplete', {StackName: stackName}).promise();
+                        var waiter = cloudformation.waitFor('stackUpdateComplete', {
+                            StackName: stackName
+                        }).promise();
                         waiter.then(function(d) {
-                            getStackOutputs(stackName)
-                                .then(function(d) {
-                                      resolve(d);
-                                })
-                                .catch(function(err) {
-                                   reject(err);
-                                });
+                                getStackOutputs(stackName)
+                                    .then(function(d) {
+                                        resolve(d);
+                                    })
+                                    .catch(function(err) {
+                                        reject(err);
+                                    });
                             })
-                        .catch(function(err) {
-                            reject(err);
-                        });
+                            .catch(function(err) {
+                                reject(err);
+                            });
                     })
                     .catch(function(err) {
-                        if(new RegExp("No updates").test(err.message)) {
+                        if (new RegExp("No updates").test(err.message)) {
                             getStackOutputs(stackName)
                                 .then(function(d) {
                                     resolve(d);
@@ -203,19 +212,21 @@ function deployStack(project, stack, environment) {
                 }
                 cloudformation.createStack(params).promise()
                     .then(function(d) {
-                        var waiter = cloudformation.waitFor('stackCreateComplete', {StackName: stackName}).promise();
+                        var waiter = cloudformation.waitFor('stackCreateComplete', {
+                            StackName: stackName
+                        }).promise();
                         waiter.then(function(d) {
-                            getStackOutputs(stackName)
-                                .then(function(d) {
-                                      resolve(d);
-                                })
-                                .catch(function(err) {
-                                   reject(err);
-                                });
+                                getStackOutputs(stackName)
+                                    .then(function(d) {
+                                        resolve(d);
+                                    })
+                                    .catch(function(err) {
+                                        reject(err);
+                                    });
                             })
-                        .catch(function(err) {
-                            reject(err);
-                        });
+                            .catch(function(err) {
+                                reject(err);
+                            });
                     })
                     .catch(function(err) {
                         reject(err);
@@ -226,17 +237,21 @@ function deployStack(project, stack, environment) {
 
 function getStackOutputs(stackName) {
     return new bluebird.Promise(function(resolve, reject) {
-        cloudformation.describeStacks({StackName: stackName}).promise()
+        cloudformation.describeStacks({
+                StackName: stackName
+            }).promise()
             .then(function(d) {
                 // console.log(d);
-                if(d.Stacks) {
+                if (d.Stacks) {
                     var hash = {};
                     d.Stacks[0].Outputs.forEach(function(item) {
                         hash[item.ExportName] = item.OutputValue;
                     });
                     resolve(hash);
                 } else {
-                    reject({'message': 'stack not found'})
+                    reject({
+                        'message': 'stack not found'
+                    })
                 }
             })
             .catch(function(err) {
@@ -253,10 +268,14 @@ function deploy(project, tables, environment) {
 function deleteStack(project, environment) {
     var stackName = environment + "-" + project;
     return new bluebird.Promise(function(resolve, reject) {
-        cloudformation.deleteStack({StackName: stackName}).promise()
+        cloudformation.deleteStack({
+                StackName: stackName
+            }).promise()
             .then(function(d) {
-                var waiter = cloudformation.waitFor('stackDeleteComplete', {StackName: stackName}).promise();
-                    waiter.then(function(d) {
+                var waiter = cloudformation.waitFor('stackDeleteComplete', {
+                    StackName: stackName
+                }).promise();
+                waiter.then(function(d) {
                         resolve(d);
                     })
                     .catch(function(err) {
@@ -270,65 +289,68 @@ function deleteStack(project, environment) {
 }
 
 function createTableDirect(name) {
-    return new bluebird.Promise(function(resolve, reject) {
-            var params = {
-                AttributeDefinitions: [
-                    {AttributeName: "id", AttributeType: "S"},
-                    {AttributeName: "hash", AttributeType: "S"},
-                    {AttributeName: "predicate", AttributeType: "S"},
-                    {AttributeName: "value", AttributeType: "S"}
-                ],
-                KeySchema:  [
-                    {AttributeName: "id", KeyType: "HASH"},
-                    {AttributeName: "hash", KeyType: "RANGE"}
-                ],
-                ProvisionedThroughput: {
-                    ReadCapacityUnits: 5,
-                    WriteCapacityUnits: 5
+    return new bluebird.Promise(async function(resolve, reject) {
+        var params = {
+            AttributeDefinitions: [{
+                AttributeName: "id",
+                AttributeType: "S"
+            }, {
+                AttributeName: "hash",
+                AttributeType: "S"
+            }, {
+                AttributeName: "predicate",
+                AttributeType: "S"
+            }, {
+                AttributeName: "value",
+                AttributeType: "S"
+            }],
+            KeySchema: [{
+                AttributeName: "id",
+                KeyType: "HASH"
+            }, {
+                AttributeName: "hash",
+                KeyType: "RANGE"
+            }],
+            ProvisionedThroughput: {
+                ReadCapacityUnits: 5,
+                WriteCapacityUnits: 5
+            },
+            GlobalSecondaryIndexes: [{
+                IndexName: "predicate-index",
+                KeySchema: [{
+                    AttributeName: "predicate",
+                    KeyType: "HASH"
+                }],
+                Projection: {
+                    ProjectionType: "ALL"
                 },
-                GlobalSecondaryIndexes: [
-                    {
-                      IndexName: "predicate-index",
-                      KeySchema: [
-                        {
-                          AttributeName: "predicate",
-                          KeyType: "HASH"
-                        }
-                      ],
-                      Projection: {
-                        ProjectionType: "ALL"
-                      },
-                      ProvisionedThroughput: {
-                        ReadCapacityUnits: "5",
-                        WriteCapacityUnits: "5"
-                      }
-                    },
-                    {
-                      IndexName: "value-index",
-                      KeySchema: [
-                        {
-                          AttributeName: "value",
-                          KeyType: "HASH"
-                        }
-                      ],
-                      Projection: {
-                        ProjectionType: "ALL"
-                      },
-                      ProvisionedThroughput: {
-                        ReadCapacityUnits: "5",
-                        WriteCapacityUnits: "5"
-                      }
-                    }
-                ],
-                TableName: name
-            }
-            const createPromise = dynamodb.createTable(params).promise();
-            createPromise.then(function(response) {
-                    resolve(response);
-                }).catch(function(err) {
-                    reject(err);
-                });
-        });
+                ProvisionedThroughput: {
+                    ReadCapacityUnits: "5",
+                    WriteCapacityUnits: "5"
+                }
+            }, {
+                IndexName: "value-index",
+                KeySchema: [{
+                    AttributeName: "value",
+                    KeyType: "HASH"
+                }],
+                Projection: {
+                    ProjectionType: "ALL"
+                },
+                ProvisionedThroughput: {
+                    ReadCapacityUnits: "5",
+                    WriteCapacityUnits: "5"
+                }
+            }],
+            TableName: name
+        }
+        await dynamodb.createTable(params).promise();
+        while (true) {
+            var result = await dynamodb.describeTable({TableName: name}).promise();
+            if(result.Table.TableStatus == 'ACTIVE') break;
+        }
+        resolve();
+    });
 }
 
 exports.generateCFN = generateCFN;
