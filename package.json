@@ -1,7 +1,5 @@
 {
-  "author": {
-    "name": "optimuspaul"
-  },
+  "author": "optimuspaul",
   "bundleDependencies": false,
   "dependencies": {
     "aws-sdk": "^2.97.0",
@@ -32,5 +30,13 @@
     "test": "mocha src/**/**.spec.js --timeout 30000",
     "thing": "node --harmony thing.js"
   },
-  "version": "1.0.1"
+  "version": "1.0.2",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/optimuspaul/dynamodb-graphql.git"
+  },
+  "bugs": {
+    "url": "https://github.com/optimuspaul/dynamodb-graphql/issues"
+  },
+  "homepage": "https://github.com/optimuspaul/dynamodb-graphql#readme"
 }
