@@ -32,3 +32,11 @@ exports.getCached = function(key) {
     });
 };
 
+exports.delCached = function(key) {
+    if(DISABLE_CACHE) {
+        console.log("------=====-------- cache disabled --------=====------");
+        return;
+    }
+    cache.del(key);
+};
+
