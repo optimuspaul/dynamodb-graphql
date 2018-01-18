@@ -229,6 +229,7 @@ function removeObject(tableName, subject) {
                     // TODO - batch the batch if it's too many
                     var prom = dynamodb.batchWriteItem(params).promise();
                     return prom.then(function(data) {
+                        cache.delCached(tableName+"::"+subject);
                         resolve({id: subject, status: true});
                     }).catch(reject);
                 } else {
@@ -373,7 +374,7 @@ function getObject(tableName, subject) {
                     cache.cacheData(tableName+"::"+subject, item, options.cacheSeconds);
                     resolve(item);
                 }
-                resolve(null);
+                reject("Item does not exist: " + tableName + "::" + subject);
             })
             .catch(function(err) {
                 console.log(err);
