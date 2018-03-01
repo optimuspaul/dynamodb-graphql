@@ -108,7 +108,7 @@ function getSubjectsWithPredicate(tableName, predicate, token) {
     // pulls a list of subjects that have a value for the specified predicate
     return new Promise(function(resolve, reject) {
         var params = {
-            Limit: 50,
+            Limit: 200,
             TableName: tableName,
             KeyConditionExpression: "predicate = :id",
             ExpressionAttributeValues: {
@@ -161,7 +161,7 @@ function getSubjectsWithPredicateValue(tableName, predicate, value) {
     // pulls a list of subjects that have a predicate with specified value
     return new Promise(function(resolve, reject) {
       var params = {
-          Limit: 50,
+          Limit: 200,
           TableName: tableName,
           KeyConditionExpression: "#my_val = :my_val",
           FilterExpression: "predicate = :id",
