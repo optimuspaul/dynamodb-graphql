@@ -30,7 +30,7 @@
     "test": "mocha src/**/**.spec.js --timeout 30000",
     "thing": "node --harmony thing.js"
   },
-  "version": "1.0.2",
+  "version": "1.0.3",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/optimuspaul/dynamodb-graphql.git"
