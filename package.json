@@ -1,6 +1,6 @@
 {
     "name": "dynamodb-graphql",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Framework for storing graph data in dynamodb and exposing it as a graphql service using apollo-server.",
     "keywords": [],
     "author": "optimuspaul",
