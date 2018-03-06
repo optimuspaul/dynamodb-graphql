@@ -50,9 +50,9 @@ function getTriple(tableName, subject, predicate, value) {
             hash: {"S": hashPair(predicate, value)},
         }
     }
-    return new Promise(function(resolve, reject) {
-        var prom = dynamodb.getItem(params).promise();
-        prom.then(function(data) {
+    return new Promise(async function(resolve, reject) {
+        try {
+            let data = await dynamodb.getItem(params).promise();
             var item = {};
             if(data.Item) {
                 for(const key in data.Item) {
@@ -60,11 +60,9 @@ function getTriple(tableName, subject, predicate, value) {
                 }
             }
             resolve(item);
-        })
-        .catch(function(err) {
-            console.log(err);
-            reject(err);
-        });
+        } catch(e) {
+            reject(e);
+        }
     });
 }
 
@@ -75,15 +73,14 @@ function writeTriple(tableName, subject, predicate, value) {
         TableName: tableName,
         Item: item,
     }
-    return new Promise(function(resolve, reject) {
-        var prom = dynamodb.putItem(params).promise();
-        prom.then(function(data) {
-                resolve(item);
-            })
-            .catch(function(err) {
-                reject(err);
-            });
-        });
+    return new Promise(async function(resolve, reject) {
+        try {
+            let data = await dynamodb.putItem(params).promise();
+            resolve(item);
+        } catch(e) {
+            reject(e);
+        }
+    });
 }
 
 function removeTriple(tableName, subject, predicate, value) {
@@ -105,10 +102,11 @@ function removeTriple(tableName, subject, predicate, value) {
 }
 
 function getSubjectsWithPredicate(tableName, predicate, token) {
+    console.log(tableName);
     // pulls a list of subjects that have a value for the specified predicate
     return new Promise(function(resolve, reject) {
         var params = {
-            Limit: 200,
+            Limit: 50,
             TableName: tableName,
             KeyConditionExpression: "predicate = :id",
             ExpressionAttributeValues: {
@@ -157,11 +155,11 @@ function getSubjectsWithPredicate(tableName, predicate, token) {
     });
 }
 
-function getSubjectsWithPredicateValue(tableName, predicate, value) {
+function getSubjectsWithPredicateValue(tableName, predicate, value, token) {
     // pulls a list of subjects that have a predicate with specified value
     return new Promise(function(resolve, reject) {
       var params = {
-          Limit: 200,
+          Limit: 50,
           TableName: tableName,
           KeyConditionExpression: "#my_val = :my_val",
           FilterExpression: "predicate = :id",

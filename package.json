@@ -1,30 +1,42 @@
 {
-    "name": "dynamodb-graphql",
-    "version": "1.0.0",
-    "description": "Framework for storing graph data in dynamodb and exposing it as a graphql service using apollo-server.",
-    "keywords": [],
-    "author": "optimuspaul",
-    "license": "MIT",
-    "main": "src/index.js",
-    "scripts": {
-        "examine": "node --harmony src/index.js",
-        "test": "mocha src/options.spec.js",
-        "thing": "node --harmony thing.js",
-        "coverage": "istanbul cover -x src/**/**.spec.js _mocha src/**/**.spec.js && open coverage/lcov-report/index.html"
-    },
-    "dependencies": {
-        "aws-sdk": "^2.97.0",
-        "bluebird": "^3.5.0",
-        "config": "^1.26.2",
-        "ejs": "^2.5.7",
-        "iso-date-str": "^1.0.0",
-        "lru-cache": "^4.1.1",
-        "merge": "^1.2.0",
-        "uuid": "^3.1.0"
-    },
-    "devDependencies": {
-        "chai": "^4.1.2",
-        "istanbul": "^0.4.5",
-        "mocha": "^3.5.0"
-    }
+  "author": "optimuspaul",
+  "bundleDependencies": false,
+  "dependencies": {
+    "aws-sdk": "^2.97.0",
+    "bluebird": "^3.5.0",
+    "config": "^1.26.2",
+    "ejs": "^2.5.7",
+    "iso-date-str": "^1.0.0",
+    "lru-cache": "^4.1.1",
+    "merge": "^1.2.0",
+    "uuid": "^3.1.0"
+  },
+  "deprecated": false,
+  "description": "Framework for storing graph data in dynamodb and exposing it as a graphql service using apollo-server.",
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "dynamo-db-local": "^2.1.2",
+    "istanbul": "^0.4.5",
+    "mocha": "^3.5.0",
+    "nyc": "^11.4.1"
+  },
+  "keywords": [],
+  "license": "MIT",
+  "main": "src/index.js",
+  "name": "@bluelines/dynamodb-graphql",
+  "scripts": {
+    "coverage": "node_modules/.bin/nyc  -x src/**/**.spec.js --reporter=html npm test --timeout 30000 && cat coverage/index.html",
+    "examine": "node --harmony src/index.js",
+    "test": "mocha src/**/**.spec.js --timeout 30000",
+    "thing": "node --harmony thing.js"
+  },
+  "version": "1.0.3",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/optimuspaul/dynamodb-graphql.git"
+  },
+  "bugs": {
+    "url": "https://github.com/optimuspaul/dynamodb-graphql/issues"
+  },
+  "homepage": "https://github.com/optimuspaul/dynamodb-graphql#readme"
 }
