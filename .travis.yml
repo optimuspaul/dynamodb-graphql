@@ -1,0 +1,23 @@
+sudo: required
+language: node_js
+node_js:
+- '8'
+addons:
+  apt:
+    packages:
+    - oracle-java8-installer
+    - oracle-java8-set-default
+env:
+  global:
+  - JAVA_HOME=/usr/lib/jvm/java-8-oracle
+  - AWS_ACCESS_KEY_ID=FAKE
+  - AWS_SECRET_ACCESS_KEY=NEWS
+script: npm test
+deploy:
+  provider: npm
+  email: paul@decoursey.net
+  api_key:
+    secure: lblhdRNq6IXr1t1WL/Kupa959kjWmjCy8NErW+4ar9K4sdSeB15v5Lyh0XAaCdQX7CYLaiQFinGHKe2w+mdPCj4NJFPgdnY0rIS/8TpG8X3simYE1aJGFDs/2xESfbdTqrXIERXVIb96xMPCpkeSK+DIGNfHTyNHxhyqws17JQAy1J8Pc3gGNXxKINEwvSamMoAxATnfwgRp7ZgE8UlgLF1Qaz2j2qWudU2jwTj24asbQFP7CyNY1xGUyMD68M4skyNLStaiSUuBV1PBUOvoug87BQWiZqoRsCF70JrohFW11K2a5Z2YOf9Z11cV07+HId6IP2+EI4tbVm+W8P1kDBpgFRQEWM0iy+i+1yWdPcFAVXnn6gtmg5E9VeZaKZDCnxoFYLwUMvacwFWod+uYTn4mb7Xrlchn8tX7FK6tiUfv9bihwbuDl47EDi5idH3+GNM3VfPvMQqQIQ7GhySrY/2wLrZhzJ/O7vv27MCkwTWrQGMqxmbKXJELVWAs8ENWV5jnUlVPSWfZ84MywSY/MlapkpS7ZjCIkpxvp1AHKBmBP1ORJcGrWnTPp71hTxlwIujY5bmQW4m5s5UGOgmjaNlVDSHWQmGQLbl1mo0df6bfi29ZcXr/Fq7BBcK+Z1RbcF5UNzF3ygcd9EKoboBYKGK4ndEMQcTPz4FOPhhpkJk=
+  on:
+    tags: true
+    repo: optimuspaul/dynamodb-graphql

@@ -1,3 +1,4 @@
+const index = require('./index.spec');
 const cache = require('./cache')  
 const expect = require('chai').expect
 
@@ -27,6 +28,8 @@ functions.forEach(function(func_name) {
 //--------------------------------------------------
 describe('cache module functionality', function() {  
     describe('"getCached"', function() {
+        // var cacheSetting = cache.DISABLE_CACHE;
+        // cache.DISABLE_CACHE = false;
         it('should cache a value to be retrieved later', function(done) {
             cache.cacheData("key", "value", 2);
             cache.getCached("key").then(function(data) {
@@ -51,6 +54,7 @@ describe('cache module functionality', function() {
                     });
             }, 1200);
         });
+        // cache.DISABLE_CACHE = cacheSetting;
     });
 });
 
