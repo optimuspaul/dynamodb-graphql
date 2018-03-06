@@ -13,7 +13,6 @@ function listNodes(type, token) {
     var predicated = base.getSubjectsWithPredicate(options.tableName(type), "id", token);
     return new bluebird.Promise(function(resolve, reject) {
         predicated.then(function(d) {
-            console.log(d.pageInfo)
             resolve({"nodes": d.subjects, "pageInfo": d.pageInfo});
         });
     });
