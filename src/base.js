@@ -157,7 +157,7 @@ function getSubjectsWithPredicate(tableName, predicate, token) {
     });
 }
 
-function getSubjectsWithPredicateValue(tableName, predicate, value) {
+function getSubjectsWithPredicateValue(tableName, predicate, value, token) {
     // pulls a list of subjects that have a predicate with specified value
     return new Promise(function(resolve, reject) {
       var params = {
@@ -174,6 +174,14 @@ function getSubjectsWithPredicateValue(tableName, predicate, value) {
           },
           IndexName: "value-index"
       }
+      if(token && token.max_items) {
+          params.Limit = token.max_items;
+      }
+      if(token && token.token) {
+          var token_string = Buffer.from(token.token, "base64");
+          params.ExclusiveStartKey = JSON.parse(token_string);
+      }
+
       var prom = dynamodb.query(params).promise();
       prom.then(function(data) {
               if(data.Items.length > 0) {
