@@ -1,3 +1,4 @@
+const index = require('./index.spec');
 const provision = require('./provision')  
 const expect = require('chai').expect
 
