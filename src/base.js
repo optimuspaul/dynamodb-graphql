@@ -16,25 +16,40 @@ if(ENVIRONMENT == "local") {
 
 var dynamodb = new AWS.DynamoDB();
 
-
-function hashPair(key, value) {
+function marshalValue(value) {
     // convert booleans to string
     if (typeof value === "boolean") {
       value = value.toString()
     }
+    return value
+}
+
+function unmarshalValue(value) {
+    // convert boolean-y strings back to bools
+    if (value === "true") {
+      return true
+    } else if (value === "false") {
+      return false
+    } else {
+      return value
+    }
+}
+
+function hashPair(key, value) {
     var hasher = crypto.createHash('sha256');
     hasher.update(key);
     hasher.update("::");
-    hasher.update(value);
+    hasher.update(marshalValue(value));
     return hasher.digest("base64");
 }
 
 function prepareTriple(subject, predicate, value, modificationDate) {
+
     return {
         "id": {"S": subject},
         "hash": {"S": hashPair(predicate, value)},
         "predicate": {"S": predicate},
-        "value": {"S": value},
+        "value": {"S": marshalValue(value)},
         "modificationDate": {"S": modificationDate},
     };
 }
@@ -60,7 +75,7 @@ function getTriple(tableName, subject, predicate, value) {
             var item = {};
             if(data.Item) {
                 for(const key in data.Item) {
-                    item[key] = data.Item[key].S;
+                    item[key] = unmarshalValue(data.Item[key].S);
                 }
             }
             resolve(item);
@@ -169,7 +184,7 @@ function getSubjectsWithPredicateValue(tableName, predicate, value, token) {
           FilterExpression: "predicate = :id",
           ExpressionAttributeValues: {
               ":id": {"S": predicate},
-              ":my_val": {"S": value}
+              ":my_val": {"S": marshalValue(value)}
           },
           ExpressionAttributeNames: {
             "#my_val": "value"
