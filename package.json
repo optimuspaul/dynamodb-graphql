@@ -28,7 +28,7 @@
     "coverage": "node_modules/.bin/nyc  -x src/**/**.spec.js --reporter=html npm test --timeout 30000 && cat coverage/index.html",
     "test": "mocha src/**/**.spec.js --timeout 30000"
   },
-  "version": "1.0.2",
+  "version": "1.0.3",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/optimuspaul/dynamodb-graphql.git"
