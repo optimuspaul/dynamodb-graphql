@@ -36,6 +36,10 @@ function unmarshalValue(value) {
 }
 
 function hashPair(key, value) {
+    // convert booleans to string
+    if (typeof value === "boolean") {
+      value = value.toString()
+    }
     var hasher = crypto.createHash('sha256');
     hasher.update(key);
     hasher.update("::");

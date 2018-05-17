@@ -26,9 +26,7 @@
   "name": "dynamodb-graphql",
   "scripts": {
     "coverage": "node_modules/.bin/nyc  -x src/**/**.spec.js --reporter=html npm test --timeout 30000 && cat coverage/index.html",
-    "examine": "node --harmony src/index.js",
-    "test": "mocha src/**/**.spec.js --timeout 30000",
-    "thing": "node --harmony thing.js"
+    "test": "mocha src/**/**.spec.js --timeout 30000"
   },
   "version": "1.0.3",
   "repository": {
@@ -38,5 +36,5 @@
   "bugs": {
     "url": "https://github.com/optimuspaul/dynamodb-graphql/issues"
   },
-  "homepage": "https://github.com/optimuspaul/dynamodb-graphql#readme"
+  "homepage": "https://github.com/optimuspaul/dynamodb-graphql/blob/master/README.md"
 }
