@@ -18,6 +18,10 @@ var dynamodb = new AWS.DynamoDB();
 
 
 function hashPair(key, value) {
+    // convert booleans to string
+    if (typeof value === "boolean") {
+      value = value.toString()
+    }
     var hasher = crypto.createHash('sha256');
     hasher.update(key);
     hasher.update("::");
@@ -172,6 +176,14 @@ function getSubjectsWithPredicateValue(tableName, predicate, value, token) {
           },
           IndexName: "value-index"
       }
+      if(token && token.max_items) {
+          params.Limit = token.max_items;
+      }
+      if(token && token.token) {
+          var token_string = Buffer.from(token.token, "base64");
+          params.ExclusiveStartKey = JSON.parse(token_string);
+      }
+
       var prom = dynamodb.query(params).promise();
       prom.then(function(data) {
               if(data.Items.length > 0) {
