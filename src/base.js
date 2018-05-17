@@ -26,9 +26,9 @@ function marshalValue(value) {
 
 function unmarshalValue(value) {
     // convert boolean-y strings back to bools
-    if (value === "true") {
+    if (value === 'true') {
       return true
-    } else if (value === "false") {
+    } else if (value === 'false') {
       return false
     } else {
       return value
@@ -372,9 +372,9 @@ function getObject(tableName, subject) {
                             if(!Array.isArray(item[value.predicate.S])) {
                                 item[value.predicate.S] = [];
                             }
-                            item[value.predicate.S].push(value);
+                            item[value.predicate.S].push(unmarshalValue(value));
                         } else {
-                            item[value.predicate.S] = value.value.S;
+                            item[value.predicate.S] = unmarshalValue(value.value.S);
                         }
                     });
                     Object.keys(item).forEach(function(key) {
@@ -393,7 +393,7 @@ function getObject(tableName, subject) {
 
                             // remove the ddb structure
                             val.forEach(function(item) {
-                                rep.push(item.value.S);
+                                rep.push(unmarshalValue(item.value.S));
                             });
                             item[key] = rep;
                         }
