@@ -68,10 +68,11 @@ exports.commonSchema = `
     max_items: Int!
     token: String
     count: Int
+    total: Int
   }
 
   type StatusOutput {
-    id: String!
+    id: String
     status: Boolean!
     message: String
   }
