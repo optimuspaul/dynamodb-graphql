@@ -7,7 +7,6 @@ const ENVIRONMENT = process.env["ENVIRONMENT"] || "dev";
 const DYNAMODB_URL = process.env["DYNAMODB_URL"] || 'localhost:8001';
 const AWS = require("aws-sdk");
 var _ = require("lodash");
-const util = require('util')
 
 
 AWS.config.region = process.env["aws-region"] || "us-east-1";
@@ -324,58 +323,20 @@ function putObject(tableName, obj) {
                     RequestItems: {
                     }
                 };
-
-                console.log("OPS: " + typeof ops + " " + ops)
-                ///Jordans batching
                 if (ops.length) {
                     var batchedOps = _.chunk(ops, 20)
                     let writes = [];
-                    var counter = 0;
                     batchedOps.forEach(function(batch){
-                        counter++
-                        console.log("BATCH #: "+ counter)
                         params.RequestItems[tableName]= batch;
-
-                        console.log("TABLENAME: " + tableName)
-
-                        console.log("PARAMS: " + util.inspect(params.RequestItems[tableName]))
-                        for(var x in params.RequestItems[tableName]) {
-                            console.log("VALUE: " + util.inspect(params.RequestItems[tableName][x].PutRequest.Item.value))
-                            console.log("PREDICATE: " + util.inspect(params.RequestItems[tableName][x].PutRequest.Item.predicate))
-                            console.log("ID: " + util.inspect(params.RequestItems[tableName][x].PutRequest.Item.id))
-                        }
 
                         writes.push(dynamodb.batchWriteItem(params).promise());
                     })
-
-                    console.log("WRITES: " + writes + " " + writes.length)
-
                     return Promise.all(writes).then(function(data) {
                         resolve({status: true, id: id, message: "success"});
                     }).catch(reject)
                 } else {
                     reject(new Error("nothing to do"));
                 }
-
-
-                //
-                // if(ops.length) {
-                //     params.RequestItems[tableName] = ops;
-                //
-                //     console.log("OPS: " + ops)
-                //     // TODO - batch the batch if it's too many
-                //     console.log("PARAMS: " + util.inspect(params.RequestItems[tableName]))
-                //     var prom = dynamodb.batchWriteItem(params).promise();
-                //     return prom.then(function(data) {
-                //         resolve({status: true, id: id, message: "success"});
-                //     }).catch(reject);
-                // }
-                //
-                // else {
-                //     reject(new Error("nothing to do"));
-                // }
-
-
             });
 
     });
