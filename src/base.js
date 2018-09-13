@@ -6,6 +6,7 @@ const newid = require("./utils").newid;
 const ENVIRONMENT = process.env["ENVIRONMENT"] || "dev";
 const DYNAMODB_URL = process.env["DYNAMODB_URL"] || 'localhost:8001';
 const AWS = require("aws-sdk");
+var _ = require("lodash");
 
 
 AWS.config.region = process.env["aws-region"] || "us-east-1";
@@ -281,7 +282,7 @@ function putObject(tableName, obj) {
     }
     var newTripleHashes = new Set([]);
     for(const key in obj) {
-        if(Array.isArray(obj[key])) {
+        if (Array.isArray(obj[key])) {
             obj[key].forEach(function(item, index) {
                 var triple = prepareTriple(id, key, item, mod);
                 newTripleHashes.add(triple.hash.S);
@@ -302,6 +303,7 @@ function putObject(tableName, obj) {
             });
         }
     }
+
     return new Promise(function(resolve, reject) {
         getObjectTriples(tableName, id)
             .then(function(data) {
@@ -321,13 +323,17 @@ function putObject(tableName, obj) {
                     RequestItems: {
                     }
                 };
-                if(ops.length) {
-                    params.RequestItems[tableName] = ops;
-                    // TODO - batch the batch if it's too many
-                    var prom = dynamodb.batchWriteItem(params).promise();
-                    return prom.then(function(data) {
+                if (ops.length) {
+                    var batchedOps = _.chunk(ops, 20)
+                    let writes = [];
+                    batchedOps.forEach(function(batch){
+                        params.RequestItems[tableName]= batch;
+
+                        writes.push(dynamodb.batchWriteItem(params).promise());
+                    })
+                    return Promise.all(writes).then(function(data) {
                         resolve({status: true, id: id, message: "success"});
-                    }).catch(reject);
+                    }).catch(reject)
                 } else {
                     reject(new Error("nothing to do"));
                 }
