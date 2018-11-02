@@ -75,5 +75,6 @@ exports.commonSchema = `
     id: String
     status: Boolean!
     message: String
+    output: [String]
   }
 `;
