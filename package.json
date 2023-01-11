@@ -18,8 +18,8 @@
     "dynamo-db-local": "^2.1.2",
     "lodash": "^4.17.4",
     "istanbul": "^0.4.5",
-    "mocha": "^3.5.0",
-    "nyc": "^11.4.1"
+    "mocha": "^10.2.0",
+    "nyc": "^15.1.0"
   },
   "keywords": [],
   "license": "MIT",
